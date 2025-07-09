@@ -1,2 +1,2 @@
 # vinyl-git
-AUR package for Vinyl (QT6 application style)
+AUR PKGBUILD for Vinyl (QT6 application style)
