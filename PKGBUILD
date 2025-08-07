@@ -1,5 +1,6 @@
 # Maintainer: DeltaCopy <7x0bb03yq@mozmail.com>
 # Description: Builds Vinyl theme from https://github.com/ekaaty/vinyl-theme
+# PKGBUILD issues: https://github.com/DeltaCopy/vinyl-git-aur
 
 # basic info
 pkgname="vinyl-git"
