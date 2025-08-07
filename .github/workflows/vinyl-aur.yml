@@ -1,0 +1,59 @@
+# Build Vinyl and publish release
+name: Vinyl AUR Tester
+on: workflow_dispatch
+env:
+  AUR_VINYL_REPO: https://aur.archlinux.org/vinyl-git.git
+  GIT_USER: DeltaCopy
+  GIT_EMAIL: 7x0bb03yq@mozmail.com
+jobs:
+  darkly-aur-ci:
+    runs-on: ubuntu-latest
+    container: archlinux:latest
+    steps:
+      - name: Checkout local
+        uses: actions/checkout@v4.2.0
+        with:
+          repository: ${{ github.repository }}
+          sparse-checkout: .github/assets
+          sparse-checkout-cone-mode: false
+
+      - name: Checkout packager utils repository
+        uses: actions/checkout@v4.2.0
+        with:
+          repository: ${{ env.GIT_USER }}/${{ env.PACKAGE_UTILS_REPO }}
+          path: packager-utils
+
+      - name: System update
+        run: pacman -Syu --noconfirm
+      - name: Install sudo, git and compile dependencies
+        run: |
+          pacman -Syq sudo git openssh binutils make gcc pkg-config fakeroot plasma-desktop \
+          cmake extra-cmake-modules qt6-base \
+          kdecoration qt6-declarative kcoreaddons \
+          kcmutils kcolorscheme kconfig kguiaddons \
+          kiconthemes kwindowsystem kcmutils5 \
+          frameworkintegration5 kconfigwidgets5 kiconthemes5 \
+          kirigami2 kwindowsystem5 inkscape xorg-xcursorgen --noconfirm
+
+      - name: Setup build user
+        run: |
+          useradd --create-home --shell /bin/bash builduser -m # Create the builduser
+          passwd -d builduser # Delete the buildusers password
+          printf 'builduser ALL=(ALL) ALL\n' | tee -a /etc/sudoers # Allow the builduser passwordless sudo
+
+      - name: Copy modified makepkg.conf over to /etc/
+        run: cp $GITHUB_WORKSPACE/.github/assets/makepkg.conf /etc/makepkg.conf
+
+      - name: Copy generated output files for vinyl to /tmp for builduser to access
+        run: |
+          mkdir /tmp/vinyl
+          cp -f PKGBUILD /tmp/vinyl
+          cp -f .SRCINFO /tmp/vinyl
+          chown -R builduser:builduser /tmp/vinyl
+
+      - name: Test vinyl build
+        run: |
+          sudo -u builduser bash -c 'cd /tmp/vinyl; makepkg -s; test $? -eq 0 && touch /tmp/.vinylbuild'
+          test $(git -C /tmp/vinyl status -s PKGBUILD | wc -l) -gt 0 && echo "VINYL_MODIFIED=true" >> "$GITHUB_ENV"
+          test -f /tmp/.vinylbuild && echo "VINYL_BUILD_STATUS=0" >> "$GITHUB_ENV"
+
