@@ -6,7 +6,7 @@ env:
   GIT_USER: DeltaCopy
   GIT_EMAIL: 7x0bb03yq@mozmail.com
 jobs:
-  darkly-aur-ci:
+  vinyl-aur-tester:
     runs-on: ubuntu-latest
     container: archlinux:latest
     steps:
@@ -16,12 +16,6 @@ jobs:
           repository: ${{ github.repository }}
           sparse-checkout: .github/assets
           sparse-checkout-cone-mode: false
-
-      - name: Checkout packager utils repository
-        uses: actions/checkout@v4.2.0
-        with:
-          repository: ${{ env.GIT_USER }}/${{ env.PACKAGE_UTILS_REPO }}
-          path: packager-utils
 
       - name: System update
         run: pacman -Syu --noconfirm
