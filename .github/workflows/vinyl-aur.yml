@@ -27,7 +27,8 @@ jobs:
           kcmutils kcolorscheme kconfig kguiaddons \
           kiconthemes kwindowsystem kcmutils5 \
           frameworkintegration5 kconfigwidgets5 kiconthemes5 \
-          kirigami2 kwindowsystem5 inkscape xorg-xcursorgen --noconfirm
+          kirigami2 kwindowsystem5 inkscape xorg-xcursorgen \
+          kdoctools kpackage frameworkintegration --noconfirm
 
       - name: Setup build user
         run: |
