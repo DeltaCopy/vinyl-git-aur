@@ -48,7 +48,7 @@ jobs:
 
       - name: Test vinyl build
         run: |
-          sudo -u builduser bash -c 'cd /tmp/vinyl; makepkg -si; test $? -eq 0 && touch /tmp/.vinylbuild'
+          sudo -u builduser bash -c 'cd /tmp/vinyl; makepkg -s; test $? -eq 0 && touch /tmp/.vinylbuild'
           test $(git -C /tmp/vinyl status -s PKGBUILD | wc -l) -gt 0 && echo "VINYL_MODIFIED=true" >> "$GITHUB_ENV"
           test -f /tmp/.vinylbuild && echo "VINYL_BUILD_STATUS=0" >> "$GITHUB_ENV"
 
